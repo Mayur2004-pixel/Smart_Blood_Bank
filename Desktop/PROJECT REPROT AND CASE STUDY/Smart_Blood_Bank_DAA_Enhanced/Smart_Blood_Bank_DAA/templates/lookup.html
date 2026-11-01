@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}BST Lookup | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Donor Lookup by ID (BST search)</h1>
+<p class="text-muted">The donor index is a Binary Search Tree. Each step goes left or right, so the number of comparisons is bounded by the tree height.</p>
+<div class="panel mb-4">
+<form method="get" class="row g-3 align-items-end">
+  <div class="col-md-4"><label class="form-label">Donor ID</label><input name="id" value="{{ donor_id }}" class="form-control" required></div>
+  <div class="col-md-2"><button class="btn btn-danger w-100">Search</button></div>
+</form>
+<hr>
+<div class="row text-center">
+  <div class="col-4"><div class="stat-number">{{ n }}</div><div class="small">donors (n)</div></div>
+  <div class="col-4"><div class="stat-number">{{ height }}</div><div class="small">BST height</div></div>
+  <div class="col-4"><div class="stat-number">{{ steps if steps is not none else '–' }}</div><div class="small">comparisons used</div></div>
+</div>
+</div>
+{% if donor %}
+<div class="panel"><h4>{{ donor.name }} <span class="blood-pill">{{ donor.blood_group }}</span></h4>
+<p class="mb-0">Location: {{ donor.location }} · Phone: {{ donor.phone }} · Last donation: {{ donor.last_donation or 'never' }} ·
+{% if donor.eligible %}<span class="badge text-bg-success">Eligible</span>{% else %}<span class="badge text-bg-secondary">Not eligible now</span>{% endif %}</p></div>
+{% endif %}
+{% endblock %}

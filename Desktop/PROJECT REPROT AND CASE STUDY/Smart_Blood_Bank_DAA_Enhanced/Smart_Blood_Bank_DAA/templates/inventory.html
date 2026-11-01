@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Inventory | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Blood Inventory</h1>
+<p class="text-muted">Units in stock per blood group. Groups at or below {{ low }} units are flagged low.</p>
+<div class="row g-4">
+<div class="col-lg-8"><div class="panel p-0 table-responsive">
+<table class="table align-middle mb-0">
+<thead><tr><th>Group</th><th>Units</th><th style="width:30%">Level</th><th>Can donate to</th></tr></thead>
+<tbody>{% for g in groups %}
+<tr><td><span class="blood-pill">{{ g }}</span></td>
+<td><strong>{{ inventory[g] }}</strong> {% if inventory[g] <= low %}<span class="badge text-bg-warning">Low</span>{% endif %}</td>
+<td><div class="progress" style="height:12px"><div class="progress-bar {% if inventory[g] <= low %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ (inventory[g] / max_units * 100)|round }}%"></div></div></td>
+<td class="small">{{ serves[g]|join(', ') }}</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="col-lg-4"><div class="panel">
+<h5>Adjust stock</h5>
+<form method="post" class="row g-3">
+  <div class="col-6"><label class="form-label">Group</label><select name="blood_group" class="form-select">{% for g in groups %}<option>{{ g }}</option>{% endfor %}</select></div>
+  <div class="col-6"><label class="form-label">Units (+/−)</label><input type="number" name="delta" value="1" class="form-control"></div>
+  <div class="col-12"><button class="btn btn-danger w-100">Update</button></div>
+</form>
+<p class="small text-muted mt-3 mb-0">Use a negative number to remove units. Stock is also changed by recorded donations and processed emergency requests.</p>
+</div></div></div>
+{% endblock %}

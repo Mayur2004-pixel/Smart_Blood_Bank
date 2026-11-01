@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Emergency Queue | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Emergency Blood Requests</h1>
+<p class="text-muted">A persistent <strong>max-priority queue</strong> (binary heap): urgency 5 is served before urgency 1; equal urgency is first-come-first-served. Processing allocates stock with a greedy strategy.</p>
+<div class="panel mb-4">
+<form method="post" class="row g-3">
+  <div class="col-md-4"><label class="form-label">Patient name (demo)</label><input required name="patient" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Blood group</label><select name="blood_group" class="form-select">{% for bg in groups %}<option>{{ bg }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label">Units</label><input type="number" min="1" max="10" value="1" name="units" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Urgency (1–5)</label><input type="number" min="1" max="5" value="5" name="urgency" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Hospital</label><select name="hospital" class="form-select">{% for l in locations %}<option>{{ l }}</option>{% endfor %}</select></div>
+  <div class="col-12"><button class="btn btn-danger">Add to queue</button></div>
+</form>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h3 class="mb-0">Pending queue ({{ queue|length }})</h3>
+  <form method="post" action="{{ url_for('process_next') }}"><button class="btn btn-danger" {% if not queue %}disabled{% endif %}>Process next request ▶</button></form>
+</div>
+<div class="panel p-0 table-responsive mb-4">
+<table class="table align-middle mb-0">
+<thead><tr><th>Order</th><th>Patient</th><th>Group</th><th>Units</th><th>Urgency</th><th>Hospital</th><th>Created</th></tr></thead>
+<tbody>{% for r in queue %}
+<tr><td>{{ loop.index }}</td><td>{{ r.patient }}</td><td><span class="blood-pill">{{ r.blood_group }}</span></td><td>{{ r.units }}</td>
+<td><span class="badge {% if r.urgency >= 4 %}text-bg-danger{% elif r.urgency == 3 %}text-bg-warning{% else %}text-bg-secondary{% endif %}">{{ r.urgency }}/5</span></td>
+<td>{{ r.hospital }}</td><td class="small">{{ r.created }}</td></tr>
+{% else %}<tr><td colspan="7" class="text-center text-muted py-4">Queue is empty.</td></tr>{% endfor %}</tbody></table></div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h3 class="mb-0">Processed history</h3>
+  {% if done %}<form method="post" action="{{ url_for('clear_history') }}"><button class="btn btn-sm btn-outline-secondary">Clear history</button></form>{% endif %}
+</div>
+<div class="panel p-0 table-responsive">
+<table class="table align-middle mb-0">
+<thead><tr><th>Patient</th><th>Needed</th><th>Allocated (greedy)</th><th>Result</th><th>Processed</th></tr></thead>
+<tbody>{% for r in done %}
+<tr><td>{{ r.patient }}</td><td>{{ r.units }}u <span class="blood-pill">{{ r.blood_group }}</span></td>
+<td>{% for g, n in r.allocation %}<span class="blood-pill me-1">{{ n }}u {{ g }}</span>{% else %}<span class="text-muted">none</span>{% endfor %}</td>
+<td>{% if r.status == 'fulfilled' %}<span class="badge text-bg-success">Fulfilled</span>
+    {% else %}<span class="badge text-bg-warning">{{ r.status|capitalize }} · short {{ r.shortfall }}u</span>
+    {% if r.donor_suggestions %}<div class="small text-muted mt-1">Nearest donors: {{ r.donor_suggestions|join('; ') }}</div>{% endif %}{% endif %}</td>
+<td class="small">{{ r.processed }}</td></tr>
+{% else %}<tr><td colspan="5" class="text-center text-muted py-4">Nothing processed yet.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

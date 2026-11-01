@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Aarav Sharma",
+    "blood_group": "O+",
+    "location": "Model Town",
+    "phone": "9000000001",
+    "available": true,
+    "last_donation": "2026-03-10",
+    "total_donations": 2
+  },
+  {
+    "id": 2,
+    "name": "Diya Verma",
+    "blood_group": "A+",
+    "location": "University",
+    "phone": "9000000002",
+    "available": true,
+    "last_donation": null,
+    "total_donations": 0
+  },
+  {
+    "id": 3,
+    "name": "Kabir Singh",
+    "blood_group": "B-",
+    "location": "Civil Lines",
+    "phone": "9000000003",
+    "available": true,
+    "last_donation": "2026-09-20",
+    "total_donations": 2
+  },
+  {
+    "id": 4,
+    "name": "Meera Gupta",
+    "blood_group": "O-",
+    "location": "Bus Stand",
+    "phone": "9000000004",
+    "available": false,
+    "last_donation": "2026-01-15",
+    "total_donations": 2
+  },
+  {
+    "id": 5,
+    "name": "Ishaan Kaur",
+    "blood_group": "AB+",
+    "location": "Railway Station",
+    "phone": "9000000005",
+    "available": true,
+    "last_donation": null,
+    "total_donations": 0
+  },
+  {
+    "id": 6,
+    "name": "Anaya Patel",
+    "blood_group": "A-",
+    "location": "Model Town",
+    "phone": "9000000006",
+    "available": true,
+    "last_donation": "2026-05-02",
+    "total_donations": 2
+  },
+  {
+    "id": 7,
+    "name": "Rehan Ali",
+    "blood_group": "O-",
+    "location": "University",
+    "phone": "9000000007",
+    "available": true,
+    "last_donation": "2026-10-10",
+    "total_donations": 2
+  },
+  {
+    "id": 8,
+    "name": "Sara Khan",
+    "blood_group": "B+",
+    "location": "Bus Stand",
+    "phone": "9000000008",
+    "available": true,
+    "last_donation": null,
+    "total_donations": 0
+  }
+]

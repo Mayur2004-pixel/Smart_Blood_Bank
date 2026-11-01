@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Camp Planner | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Donation Camp Planner</h1>
+<p class="text-muted">0/1 knapsack (dynamic programming): given an outreach budget, invite the eligible donors that cover the biggest stock shortage. <em>Value</em> = units a donor's group is below the target of {{ 6 }} units; <em>cost</em> = outreach effort.</p>
+<div class="panel mb-4">
+<form method="post" class="row g-3 align-items-end">
+  <div class="col-md-4"><label class="form-label">Outreach budget</label><input type="number" min="1" max="30" name="budget" value="{{ budget }}" class="form-control"></div>
+  <div class="col-md-2"><button class="btn btn-danger w-100">Plan</button></div>
+</form></div>
+<div class="row g-4">
+<div class="col-lg-6"><div class="panel">
+<h5>Recommended invitations</h5>
+<p>Total value <strong>{{ best }}</strong> · cost used <strong>{{ spent }}/{{ budget }}</strong></p>
+<ul class="mb-0">{% for c in chosen %}<li>{{ c.name }} <span class="blood-pill">{{ c.blood_group }}</span> (cost {{ c.cost }}, value {{ c.value }})</li>{% else %}<li class="text-muted">No candidates.</li>{% endfor %}</ul>
+</div></div>
+<div class="col-lg-6"><div class="panel">
+<h5>All candidates ({{ cands|length }})</h5>
+<ul class="mb-0 small">{% for c in cands %}<li>{{ c.name }} ({{ c.blood_group }}) · cost {{ c.cost }} · value {{ c.value }}</li>{% else %}<li class="text-muted">All eligible donors' groups are well stocked.</li>{% endfor %}</ul>
+</div></div></div>
+{% endblock %}

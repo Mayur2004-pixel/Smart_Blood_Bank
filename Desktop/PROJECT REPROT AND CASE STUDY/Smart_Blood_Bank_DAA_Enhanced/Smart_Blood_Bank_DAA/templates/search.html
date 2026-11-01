@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Find Donor | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Find Compatible Donors</h1>
+<p class="text-muted">Select the recipient's blood group and the hospital location.</p>
+<div class="panel mb-4">
+<form method="post" class="row g-3 align-items-end">
+  <div class="col-md-4">
+    <label class="form-label">Recipient blood group</label>
+    <select class="form-select" name="blood_group">
+      {% for bg in groups %}<option value="{{ bg }}" {% if blood_group == bg %}selected{% endif %}>{{ bg }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Hospital / starting point</label>
+    <select class="form-select" name="hospital">
+      {% for loc in locations %}<option value="{{ loc }}" {% if hospital == loc %}selected{% endif %}>{{ loc }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="only_eligible" id="el" {% if only_eligible %}checked{% endif %}>
+    <label class="form-check-label small" for="el">Only eligible (90-day rule)</label></div>
+  </div>
+  <div class="col-md-2"><button class="btn btn-danger w-100">Search</button></div>
+</form>
+</div>
+
+{% if stock_plan %}
+<div class="panel mb-4">
+  <h5>Blood bank stock for {{ blood_group }} recipients <span class="small text-muted">(greedy order: exact match first, O− last)</span></h5>
+  {% for g, u in stock_plan %}<span class="blood-pill me-2 mb-1">{{ g }}: {{ u }} unit{{ '' if u == 1 else 's' }}</span>{% endfor %}
+</div>
+{% endif %}
+
+{% if matches %}
+<h3 class="mb-3">Matching donors (nearest first)</h3>
+<div class="table-responsive panel p-0">
+<table class="table table-hover align-middle mb-0">
+<thead><tr><th>#</th><th>Donor</th><th>Blood group</th><th>Location</th><th>Distance</th><th>Shortest route</th><th>Status</th></tr></thead>
+<tbody>
+{% for d in matches %}
+<tr>
+<td>{{ loop.index }}</td>
+<td><strong>{{ d.name }}</strong><div class="small text-muted">ID: {{ d.id }} · {{ d.phone }}</div></td>
+<td><span class="blood-pill">{{ d.blood_group }}</span>{% if d.exact %}<div class="small text-success">exact match</div>{% endif %}</td>
+<td>{{ d.location }}</td>
+<td><strong>{{ d.distance }} km</strong></td>
+<td class="small">{{ d.route|join(" → ") }}</td>
+<td>{% if d.eligible %}<span class="badge text-bg-success">Eligible</span>
+    {% elif not d.available %}<span class="badge text-bg-secondary">Unavailable</span>
+    {% else %}<span class="badge text-bg-warning">Resting until {{ d.next_date }}</span>{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody></table></div>
+{% endif %}
+{% endblock %}

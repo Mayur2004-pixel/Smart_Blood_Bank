@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Donors | Smart Blood Bank{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+  <h1 class="page-title mb-0">Donor Records</h1>
+  <div><a class="btn btn-sm btn-outline-secondary me-1" href="{{ url_for('lookup') }}">BST ID lookup</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('export_csv') }}">Export CSV</a></div>
+</div>
+<div class="panel mb-4 mt-3">
+<h3>Add a sample donor</h3>
+<form method="post" class="row g-3">
+  <div class="col-md-3"><label class="form-label">Name</label><input required name="name" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Blood group</label><select name="blood_group" class="form-select">{% for bg in groups %}<option>{{ bg }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><label class="form-label">Location</label><select name="location" class="form-select">{% for loc in locations %}<option>{{ loc }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label">Phone (10 digits, demo)</label><input required name="phone" pattern="[0-9]{10}" class="form-control"></div>
+  <div class="col-md-2 d-flex align-items-end"><button class="btn btn-danger w-100">Add donor</button></div>
+</form>
+</div>
+
+<form method="get" class="panel mb-3 row g-2 align-items-end">
+  <div class="col-md-4"><label class="form-label small mb-1">Search name / phone / location</label><input name="q" value="{{ q }}" class="form-control" placeholder="e.g. Aar"></div>
+  <div class="col-md-2"><label class="form-label small mb-1">Blood group</label><select name="group" class="form-select"><option value="">All</option>{% for bg in groups %}<option {% if fgroup == bg %}selected{% endif %}>{{ bg }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label small mb-1">Status</label><select name="status" class="form-select">
+    <option value="">All</option>
+    <option value="eligible" {% if status=='eligible' %}selected{% endif %}>Eligible</option>
+    <option value="resting" {% if status=='resting' %}selected{% endif %}>Resting ({{ gap }}-day gap)</option>
+    <option value="unavailable" {% if status=='unavailable' %}selected{% endif %}>Unavailable</option></select></div>
+  <div class="col-md-2"><label class="form-label small mb-1">Sort by (merge sort)</label><select name="sort" class="form-select">
+    {% for k, label in [('id','ID'),('name','Name'),('group','Blood group'),('donations','Most donations')] %}<option value="{{ k }}" {% if sort==k %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2 d-flex gap-1"><button class="btn btn-danger w-100">Apply</button><a href="{{ url_for('donors_page') }}" class="btn btn-outline-secondary">Reset</a></div>
+</form>
+<p class="small text-muted">Showing {{ donors|length }} of {{ total }} donors.</p>
+
+<div class="panel p-0 table-responsive">
+<table class="table table-hover align-middle mb-0">
+<thead><tr><th>ID</th><th>Name</th><th>Blood group</th><th>Location</th><th>Last donation</th><th>Donations</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>{% for d in donors %}
+<tr><td>{{ d.id }}</td><td>{{ d.name }}<div class="small text-muted">{{ d.phone }}</div></td><td><span class="blood-pill">{{ d.blood_group }}</span></td><td>{{ d.location }}</td>
+<td>{% if d.last_donation %}{{ d.last_donation }}<div class="small text-muted">{{ d.days_since }} days ago</div>{% else %}<span class="text-muted">never</span>{% endif %}</td>
+<td>{{ d.total_donations or 0 }}</td>
+<td>{% if not d.available %}<span class="badge text-bg-secondary">Unavailable</span>
+    {% elif d.eligible %}<span class="badge text-bg-success">Eligible</span>
+    {% else %}<span class="badge text-bg-warning">Resting</span><div class="small text-muted">until {{ d.next_date }}</div>{% endif %}</td>
+<td class="text-nowrap">
+  <form method="post" action="{{ url_for('record_donation', donor_id=d.id) }}" class="d-inline"><button class="btn btn-sm btn-outline-danger" {% if not d.eligible %}disabled{% endif %}>Record donation</button></form>
+  <form method="post" action="{{ url_for('toggle_donor', donor_id=d.id) }}" class="d-inline"><button class="btn btn-sm btn-outline-secondary">Toggle</button></form>
+  <form method="post" action="{{ url_for('delete_donor', donor_id=d.id) }}" class="d-inline" onsubmit="return confirm('Remove this donor?')"><button class="btn btn-sm btn-outline-dark">✕</button></form>
+</td></tr>
+{% else %}<tr><td colspan="8" class="text-center text-muted py-4">No donors match.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

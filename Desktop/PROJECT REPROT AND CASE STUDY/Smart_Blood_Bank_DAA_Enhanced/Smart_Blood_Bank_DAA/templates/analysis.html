@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Analysis | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Algorithm Analysis</h1>
+<p class="text-muted">Live benchmark on random integer lists (milliseconds, measured when this page loads).</p>
+<div class="panel mb-4"><canvas id="chart" height="110"></canvas></div>
+<div class="panel p-0 table-responsive mb-4">
+<table class="table mb-0 text-center"><thead><tr><th class="text-start">Algorithm</th>{% for n in bench.sizes %}<th>n = {{ n }}</th>{% endfor %}</tr></thead>
+<tbody>{% for name in ['Merge Sort','Quick Sort','Bubble Sort','Python sorted()'] %}
+<tr><td class="text-start">{{ name }}</td>{% for v in bench[name] %}<td>{{ v }} ms</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+
+<div class="panel p-0 table-responsive">
+<h5 class="p-3 pb-0">Complexity summary</h5>
+<table class="table mb-0">
+<thead><tr><th>Algorithm</th><th>Technique</th><th>Time</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>Dijkstra</td><td>Greedy / shortest path</td><td>O((V+E) log V)</td><td>Donor distance & route</td></tr>
+<tr><td>BFS</td><td>Graph traversal</td><td>O(V+E)</td><td>Fewest-road route</td></tr>
+<tr><td>Floyd–Warshall</td><td>Dynamic programming</td><td>O(V³)</td><td>Distance matrix</td></tr>
+<tr><td>Prim</td><td>Greedy / MST</td><td>O(E log V)</td><td>Cheapest connected roads</td></tr>
+<tr><td>Merge sort</td><td>Divide & conquer</td><td>O(n log n)</td><td>Donor ranking, table sorting</td></tr>
+<tr><td>Quick sort</td><td>Divide & conquer</td><td>avg O(n log n), worst O(n²)</td><td>Benchmark</td></tr>
+<tr><td>Bubble sort</td><td>Brute force</td><td>O(n²)</td><td>Benchmark baseline</td></tr>
+<tr><td>BST insert / search</td><td>Tree</td><td>avg O(log n), worst O(n)</td><td>Donor index & ID lookup</td></tr>
+<tr><td>Binary search</td><td>Divide & conquer</td><td>O(log n + k)</td><td>Name prefix search</td></tr>
+<tr><td>Heap priority queue</td><td>Binary heap</td><td>push/pop O(log n)</td><td>Emergency queue</td></tr>
+<tr><td>Greedy allocation</td><td>Greedy</td><td>O(g log g), g = 8</td><td>Stock allocation</td></tr>
+<tr><td>0/1 Knapsack</td><td>Dynamic programming</td><td>O(n·W)</td><td>Camp planner</td></tr>
+</tbody></table></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const b = {{ bench_json|safe }};
+const colors = {'Merge Sort':'#b42335','Quick Sort':'#f59e0b','Bubble Sort':'#2563eb','Python sorted()':'#16a34a'};
+new Chart(document.getElementById('chart'), {type:'line',
+  data:{labels:b.sizes, datasets:Object.keys(colors).map(k=>({label:k,data:b[k],borderColor:colors[k],backgroundColor:colors[k],tension:.25}))},
+  options:{plugins:{title:{display:true,text:'Time (ms) vs input size n'}},scales:{x:{title:{display:true,text:'n'}},y:{title:{display:true,text:'ms'}}}}});
+</script>
+{% endblock %}

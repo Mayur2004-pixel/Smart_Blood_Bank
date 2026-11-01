@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Road Network | Smart Blood Bank{% endblock %}
+{% block content %}
+<h1 class="page-title">Road Network Algorithms</h1>
+<p class="text-muted">The city is a weighted graph (vertices = locations, edges = roads in km). Blue = selected Dijkstra route, green dashed = Prim minimum spanning tree.</p>
+<div class="row g-4 mb-4">
+<div class="col-lg-7"><div class="panel">
+<svg viewBox="0 0 540 300" class="w-100">
+  {% for (a, b), w in edges.items() %}
+    {% set x1, y1 = pos[a] %}{% set x2, y2 = pos[b] %}
+    <line x1="{{ x1 }}" y1="{{ y1 }}" x2="{{ x2 }}" y2="{{ y2 }}"
+      stroke="{% if (a, b) in highlight %}#2563eb{% elif (a, b) in mst_set %}#16a34a{% else %}#cbd5e1{% endif %}"
+      stroke-width="{% if (a, b) in highlight %}5{% else %}3{% endif %}" {% if (a, b) in mst_set and (a, b) not in highlight %}stroke-dasharray="8 5"{% endif %}/>
+    <text x="{{ (x1 + x2) / 2 }}" y="{{ (y1 + y2) / 2 - 5 }}" font-size="12" text-anchor="middle" fill="#475569" font-weight="700">{{ w }}</text>
+  {% endfor %}
+  {% for n, (x, y) in pos.items() %}
+    <circle cx="{{ x }}" cy="{{ y }}" r="14" fill="{% if n == src or n == dst %}#b42335{% else %}#7f1728{% endif %}" stroke="white" stroke-width="3"/>
+    <text x="{{ x }}" y="{{ y + 32 }}" font-size="12" text-anchor="middle" fill="#263238" font-weight="600">{{ n }}</text>
+  {% endfor %}
+</svg></div></div>
+<div class="col-lg-5"><div class="panel">
+<h5>Route finder</h5>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-5"><select name="src" class="form-select">{% for n in nodes %}<option {% if n == src %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
+  <div class="col-5"><select name="dst" class="form-select">{% for n in nodes %}<option {% if n == dst %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
+  <div class="col-2"><button class="btn btn-danger w-100">Go</button></div>
+</form>
+{% if route and route.dijkstra_path %}
+<p class="mb-1"><strong>Dijkstra (shortest km):</strong> {{ route.dijkstra_km }} km</p>
+<p class="small">{{ route.dijkstra_path|join(' → ') }}</p>
+<p class="mb-1"><strong>BFS (fewest roads):</strong> {{ route.bfs_hops }} hop(s), {{ route.bfs_km }} km</p>
+<p class="small mb-2">{{ route.bfs_path|join(' → ') }}</p>
+<p class="small text-muted mb-0">BFS ignores weights, so its path can be longer in km. Dijkstra is correct for weighted roads.</p>
+{% else %}<p class="text-muted">No route.</p>{% endif %}
+</div></div></div>
+
+<div class="row g-4">
+<div class="col-lg-7"><div class="panel p-0 table-responsive">
+<h5 class="p-3 pb-0">All-pairs distances (Floyd–Warshall, O(V³))</h5>
+<table class="table table-sm text-center align-middle mb-0">
+<thead><tr><th></th>{% for n in fw_nodes %}<th class="small">{{ n }}</th>{% endfor %}</tr></thead>
+<tbody>{% for i in range(fw_nodes|length) %}<tr><th class="text-start small">{{ fw_nodes[i] }}</th>
+{% for j in range(fw_nodes|length) %}<td class="{% if i == j %}text-muted{% endif %}">{{ matrix[i][j]|int }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div></div>
+<div class="col-lg-5"><div class="panel">
+<h5>Minimum spanning tree (Prim, O(E log V))</h5>
+<ul class="small">{% for a, b, w in mst %}<li>{{ a }} — {{ b }} ({{ w }} km)</li>{% endfor %}</ul>
+<p class="mb-0"><strong>{{ mst_total }} km</strong> of road connects every location, versus {{ total_edges }} km for the full network.</p>
+</div></div></div>
+{% endblock %}

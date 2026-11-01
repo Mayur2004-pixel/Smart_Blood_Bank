@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Smart Blood Bank{% endblock %}
+{% block content %}
+<section class="hero p-4 p-md-5 mb-4">
+  
+  <h1 class="display-5 fw-bold mt-2">Smart Blood Bank & Donor Matching</h1>
+  <p class="lead mb-4">Find compatible eligible donors, manage stock, and process emergencies by priority.</p>
+  <a class="btn btn-light btn-lg me-2" href="{{ url_for('search') }}">Find a Donor</a>
+  <a class="btn btn-outline-light btn-lg me-2" href="{{ url_for('emergency') }}">Emergency Queue</a>
+  <a class="btn btn-outline-light btn-lg" href="{{ url_for('donors_page') }}">Manage Donors</a>
+</section>
+
+{% if low %}
+<div class="alert alert-warning"><strong>Low stock alert:</strong>
+  {% for g in low %}<span class="blood-pill me-1">{{ g }} ({{ inventory[g] }}u)</span>{% endfor %}
+  at or below {{ low_threshold }} units. <a href="{{ url_for('camp') }}">Plan a donation camp →</a></div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-number">{{ donors|length }}</div><div>Total sample donors</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-number">{{ available }}</div><div>Eligible to donate now</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-number">{{ total_units }}</div><div>Units in stock</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-number">{{ pending }}</div><div>Pending emergencies</div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="panel mb-4">
+      <h3>Blood stock</h3>
+      {% for g, u in inventory.items() %}
+      <div class="d-flex align-items-center mb-2">
+        <span class="blood-pill me-3" style="width:56px;text-align:center">{{ g }}</span>
+        <div class="progress flex-grow-1" style="height:18px">
+          <div class="progress-bar {% if u <= low_threshold %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="width: {{ (u / max_units * 100)|round }}%">{{ u }}</div>
+        </div>
+      </div>
+      {% endfor %}
+      <a href="{{ url_for('inventory') }}" class="small">Manage inventory →</a>
+    </div>
+    <div class="panel">
+      <h3>DAA techniques used</h3>
+      <ol class="mb-0">
+        <li>Lookup table → blood compatibility, O(1)</li>
+        <li>BST → donor index, ID search and traversal</li>
+        <li>Binary search → donor name search</li>
+        <li>Dijkstra / BFS → shortest route by km / by hops</li>
+        <li>Floyd–Warshall → all-pairs distance matrix</li>
+        <li>Prim's algorithm → minimum spanning road network</li>
+        <li>Merge / Quick / Bubble sort → ranking and benchmarking</li>
+        <li>Binary heap priority queue → emergency processing</li>
+        <li>Greedy → stock allocation conserving O−</li>
+        <li>0/1 knapsack DP → donation camp planner</li>
+      </ol>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="panel mb-4">
+      <h3>Recent activity</h3>
+      {% if activity %}<ul class="list-unstyled mb-0 small">
+        {% for a in activity %}<li class="mb-2"><span class="text-muted">{{ a.time }}</span><br>{{ a.text }}</li>{% endfor %}
+      </ul>{% else %}<p class="text-muted mb-0">No activity yet.</p>{% endif %}
+    </div>
+    <div class="panel">
+      <h3>Important note</h3>
+      <p class="mb-0">This is an academic simulation with fictional sample data and illustrative road distances. Blood compatibility and donor eligibility must always be confirmed by qualified medical professionals and a licensed blood bank.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

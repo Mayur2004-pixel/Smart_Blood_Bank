@@ -1,0 +1,15 @@
+:root { --red: #b42335; --ink: #263238; --muted: #64748b; }
+body { background: #f5f7fb; color: var(--ink); font-family: Inter, system-ui, Arial, sans-serif; }
+.navbar { background: #7f1728; }
+.hero { color: white; border-radius: 22px; background: linear-gradient(120deg, #941d34, #d94b58); box-shadow: 0 12px 30px #8d1e3026; }
+.eyebrow { letter-spacing: .14em; font-size: .75rem; font-weight: 700; opacity: .85; }
+.stat-card, .panel { background: white; border: 1px solid #e8ebf1; border-radius: 16px; padding: 22px; box-shadow: 0 5px 18px #26323808; }
+.stat-number { color: var(--red); font-size: 2.2rem; font-weight: 800; }
+.page-title { font-weight: 800; margin-bottom: .35rem; }
+.blood-pill { display: inline-block; padding: 5px 10px; border-radius: 999px; color: #9b1c31; background: #fff0f2; font-weight: 700; }
+.table thead th { background: #fff7f8; color: #7f1728; font-size: .88rem; }
+.btn-danger { background: #a91f36; border-color: #a91f36; }
+.btn-danger:hover { background: #7f1728; border-color: #7f1728; }
+.nav-link { font-size: .93rem; }
+.panel h3 { font-size: 1.25rem; }
+.progress-bar { font-weight: 700; }
